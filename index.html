@@ -941,20 +941,38 @@ h2 {
 
 /* Contact strip below hero */
 .home-connect {
-  background: var(--color-green);
+  background: var(--color-white);
   padding: 34px 5%;
-  border-top: 1px solid rgba(196,162,39,0.3);
+  border-top: 2px solid var(--color-green);
 }
 
 .home-connect-inner {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.home-connect-actions {
+  display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 18px 48px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.home-connect-actions .btn-outline,
+.home-connect-actions .btn-primary { min-width: 200px; text-align: center; white-space: nowrap; }
+
+.home-connect-actions .btn-outline {
+  border-color: var(--color-green);
+  color: var(--color-green);
+}
+.home-connect-actions .btn-outline:hover {
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
 .home-connect-row {
@@ -977,38 +995,28 @@ h2 {
 .home-connect-divider {
   width: 1px;
   height: 34px;
-  background: rgba(255,255,255,0.18);
+  background: rgba(27,77,46,0.2);
   flex-shrink: 0;
 }
 
 .home-connect-label {
   display: block;
   font-size: 10px;
-  color: rgba(255,255,255,0.5);
+  color: var(--color-green);
+  opacity: 0.6;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .home-connect-value {
   display: block;
-  color: var(--color-white);
+  color: var(--color-green);
   font-weight: 500;
   font-size: 14px;
   transition: color 0.2s;
 }
 
-a.home-connect-item:hover .home-connect-value { color: var(--color-gold-light); }
-
-.home-connect-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.home-connect-actions .btn-outline,
-.home-connect-actions .btn-primary { min-width: 200px; text-align: center; white-space: nowrap; }
+a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
 
 
 
@@ -3262,25 +3270,25 @@ input[type="date"]:focus { border-color: var(--color-green); }
 
   <div class="home-connect">
     <div class="home-connect-inner">
+      <div class="home-connect-actions">
+        <button class="btn-outline" onclick="bookConsult()">Schedule a Consultation</button>
+        <button class="btn-primary btn-primary--gold" onclick="showPage('financing')">Apply for Financing</button>
+      </div>
       <div class="home-connect-row">
-        <a class="home-connect-item" href="tel:+15166556910">
-          <span class="home-connect-label">Phone</span>
-          <span class="home-connect-value">(516) 655-6910</span>
-        </a>
-        <span class="home-connect-divider"></span>
         <a class="home-connect-item" href="mailto:info@brantprofessionalservices.com">
           <span class="home-connect-label">Email</span>
           <span class="home-connect-value">info@brantprofessionalservices.com</span>
+        </a>
+        <span class="home-connect-divider"></span>
+        <a class="home-connect-item" href="tel:+15166556910">
+          <span class="home-connect-label">Phone</span>
+          <span class="home-connect-value">(516) 655-6910</span>
         </a>
         <span class="home-connect-divider"></span>
         <div class="home-connect-item">
           <span class="home-connect-label">Location</span>
           <span class="home-connect-value">New York, USA</span>
         </div>
-      </div>
-      <div class="home-connect-actions">
-        <button class="btn-outline" onclick="bookConsult()">Schedule a Consultation</button>
-        <button class="btn-primary btn-primary--gold" onclick="showPage('financing')">Apply for Financing</button>
       </div>
     </div>
   </div>
