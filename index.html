@@ -1171,6 +1171,7 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold-light); 
   align-items: start;
   padding: 32px 0;
   border-bottom: 1px solid var(--color-gray-light);
+  scroll-margin-top: 150px;
 }
 
 .service-entry:last-child { border-bottom: none; }
@@ -1376,6 +1377,69 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold-light); 
   background: var(--color-green);
   color: var(--color-white);
   border-color: var(--color-green);
+}
+
+
+/* Services subnav */
+.services-subnav {
+  background: var(--color-green);
+  border-bottom: 2px solid rgba(196,162,39,0.35);
+  position: sticky;
+  top: var(--layout-offset);
+  z-index: 90;
+  display: flex;
+  align-items: stretch;
+}
+.services-subnav-inner {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  flex: 1;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.services-subnav-inner::-webkit-scrollbar { display: none; }
+.services-subnav-arrow {
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.18);
+  border: none;
+  color: rgba(255,255,255,0.85);
+  width: 28px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  padding: 0;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.services-subnav-arrow--right { border-right: none; border-left: 1px solid rgba(255,255,255,0.08); }
+.services-subnav-arrow:hover { background: rgba(0,0,0,0.32); }
+.services-nav-btn {
+  color: rgba(255,255,255,0.7);
+  background: none;
+  border: none;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 0 14px;
+  height: 36px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Outfit', sans-serif;
+  white-space: nowrap;
+}
+.services-nav-btn:last-child { border-right: none; }
+.services-nav-btn:hover { color: var(--color-white); background: rgba(255,255,255,0.07); }
+.services-nav-btn.is-active {
+  color: var(--color-gold-light);
+  background: rgba(196,162,39,0.15);
+  font-weight: 600;
 }
 
 .resources-section      { padding: 46px 5%; }
@@ -2309,6 +2373,10 @@ input[type="date"]:focus { border-color: var(--color-green); }
   .resources-subnav { padding: 8px 3%; }
   .resources-nav-btn { padding: 7px 11px; font-size: 12px; }
 
+  /* Services subnav — scrollable ribbon on mobile */
+  .services-nav-btn { font-size: 11px; padding: 0 11px; }
+  .services-subnav-arrow { width: 24px; font-size: 20px; }
+
   /* Forms grid */
   .form-download-card { padding: 10px; gap: 8px; }
   .form-download-name { font-size: 12px; }
@@ -2732,6 +2800,7 @@ input[type="date"]:focus { border-color: var(--color-green); }
   .btn-service,
   .nav-dropdown,
   .resources-subnav,
+  .services-subnav,
   .upload-cta,
   .documents-upload-form,
   .upload-disclaimer,
@@ -3526,6 +3595,24 @@ input[type="date"]:focus { border-color: var(--color-green); }
 
   
 <div class="page" id="page-services">
+  <div class="services-subnav" id="services-subnav">
+    <button class="services-subnav-arrow services-subnav-arrow--left" id="svc-arrow-left" onclick="svcSubnavScroll(-120)" aria-label="Scroll left">&#8249;</button>
+    <div class="services-subnav-inner" id="services-subnav-inner">
+      <button class="services-nav-btn is-active" onclick="scrollToService('svc-01', this)">CFO Services</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-03', this)">Capital Solutions</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-02', this)">Tax &amp; Accounting</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-05', this)">Strategic Advisory</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-11', this)">Compliance</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-10', this)">Due Diligence</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-12', this)">Technology &amp; Systems</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-08', this)">Payroll</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-09', this)">Bookkeeping</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-06', this)">Cross-Functional</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-04', this)">Construction Finance</button>
+      <button class="services-nav-btn" onclick="scrollToService('svc-07', this)">Legal Finance</button>
+    </div>
+    <button class="services-subnav-arrow services-subnav-arrow--right" id="svc-arrow-right" onclick="svcSubnavScroll(120)" aria-label="Scroll right">&#8250;</button>
+  </div>
   <div class="page-hero">
     <h1 class="animate-fade-up">Financial Consulting &amp; Advisory Services</h1>
     <p class="animate-fade-up animate-fade-up--delay-1">
@@ -6368,53 +6455,7 @@ window.addEventListener('resize', () => {
   updateBodyPadding();
 });
 
-// ── SCROLL-TO-REVEAL (mobile only) ──────────────────────────────────────────
-(function() {
-  var lastScrollY = 0;
-  var ticking = false;
-
-  function onScroll() {
-    if (!ticking) {
-      requestAnimationFrame(function() {
-        var currentY = window.scrollY || window.pageYOffset;
-        var delta = currentY - lastScrollY;
-
-        if (isMobile()) {
-          var nav = document.getElementById('site-nav');
-          var hdr = document.getElementById('site-header') || document.querySelector('.site-header');
-
-          if (delta < -6) {
-            // Scrolling UP — reveal header and collapse nav menu (don't auto-open menu, just make header visible)
-            if (hdr) hdr.style.transform = 'translateY(0)';
-            // If nav menu was open keep it open; if closed keep it closed
-            if (nav && !navIsOpen) {
-              nav.classList.add('is-collapsed');
-            }
-          } else if (delta > 6 && currentY > 80) {
-            // Scrolling DOWN past threshold — hide header and nav
-            if (hdr) hdr.style.transform = 'translateY(-100%)';
-            if (nav)  nav.style.transform = 'translateY(-110%)';
-            if (nav)  nav.classList.add('is-collapsed');
-            navIsOpen = false;
-            document.getElementById('hamburger-btn').classList.remove('is-open');
-          }
-        }
-
-        lastScrollY = currentY;
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }
-
-  // Reset header transform on resize to desktop (CSS handles visibility)
-  window.addEventListener('resize', function() {
-    var hdr = document.querySelector('.site-header');
-    if (hdr) hdr.style.transform = '';
-  });
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-})();
+// Header and nav remain fixed — no scroll-hide behavior.
 
 // ── PAGE ROUTING ──────────────────────────────────────────────────────────
 const NAV_IDS = {
@@ -6441,9 +6482,11 @@ function goHome() {
 }
 
 function showPage(name) {
-  // Reset header visibility (in case scroll-hide hid it)
+  // Ensure header and nav are fully visible (no inline transforms)
   var hdr = document.querySelector('.site-header');
   if (hdr) hdr.style.transform = '';
+  var nav = document.getElementById('site-nav');
+  if (nav) nav.style.transform = '';
 
   // Hide all pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('is-active'));
@@ -6511,6 +6554,88 @@ function scrollToResource(sectionId, btn) {
     }, 50);
   }
 }
+
+// ── SERVICES SUBNAV — scroll-spy + click nav ─────────────────────────────
+
+// Map svc-id → button index (matches DOM order)
+const SVC_ORDER = ['svc-01','svc-03','svc-02','svc-05','svc-11','svc-10','svc-12','svc-08','svc-09','svc-06','svc-04','svc-07'];
+
+// Set the active subnav button and scroll the strip to keep it visible
+function svcSetActive(serviceId) {
+  const btns = document.querySelectorAll('.services-nav-btn');
+  const idx  = SVC_ORDER.indexOf(serviceId);
+  btns.forEach((b, i) => b.classList.toggle('is-active', i === idx));
+  const inner = document.getElementById('services-subnav-inner');
+  if (inner && idx >= 0) {
+    const btn = btns[idx];
+    if (btn) {
+      // Scroll the strip so the active btn is centred
+      const stripW  = inner.offsetWidth;
+      const btnLeft = btn.offsetLeft;
+      const btnW    = btn.offsetWidth;
+      inner.scrollTo({ left: btnLeft - stripW / 2 + btnW / 2, behavior: 'smooth' });
+    }
+  }
+}
+
+// Click handler — jump to section then update active
+function scrollToService(serviceId, btn) {
+  svcSetActive(serviceId);
+  const el = document.getElementById(serviceId);
+  if (el) {
+    setTimeout(() => {
+      const subnavH = (document.getElementById('services-subnav') || {offsetHeight: 36}).offsetHeight;
+      const top = el.getBoundingClientRect().top + window.scrollY - getHeaderHeight() - subnavH - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }, 50);
+  }
+}
+
+// Arrow buttons
+function svcSubnavScroll(delta) {
+  const inner = document.getElementById('services-subnav-inner');
+  if (inner) inner.scrollBy({ left: delta, behavior: 'smooth' });
+}
+
+// Scroll-spy — highlight whichever service entry is nearest the top of the viewport
+(function() {
+  function svcSpyTick() {
+    const svcPage = document.getElementById('page-services');
+    if (!svcPage || !svcPage.classList.contains('is-active')) return;
+    const headerH = getHeaderHeight();
+    const subnavH = (document.getElementById('services-subnav') || {offsetHeight: 36}).offsetHeight;
+    const threshold = headerH + subnavH + 12;
+    // Walk entries in reverse — last one whose top <= threshold is the "current" section
+    let active = SVC_ORDER[0];
+    for (var i = 0; i < SVC_ORDER.length; i++) {
+      const el = document.getElementById(SVC_ORDER[i]);
+      if (el && el.getBoundingClientRect().top <= threshold) {
+        active = SVC_ORDER[i];
+      }
+    }
+    svcSetActive(active);
+  }
+
+  var _svcScrollTicking = false;
+  function onSvcScroll() {
+    if (!_svcScrollTicking) {
+      requestAnimationFrame(function() { svcSpyTick(); _svcScrollTicking = false; });
+      _svcScrollTicking = true;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('scroll', onSvcScroll, { passive: true });
+    // Wrap showPage to re-run spy when services page opens
+    var orig = window.showPage;
+    if (orig) {
+      window.showPage = function(name) {
+        orig(name);
+        if (name === 'services') { setTimeout(svcSpyTick, 120); }
+      };
+    }
+  });
+})();
 
 
 // ── MULTI-SELECT (Services of Interest) ──────────────────────────────────
