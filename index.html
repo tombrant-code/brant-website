@@ -1142,9 +1142,10 @@ h2 {
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(1,36,11,0.92) 0%,
-    rgba(1,36,11,0.65) 55%,
-    rgba(1,36,11,0.20) 100%
+    rgba(0,0,0,0.72) 0%,
+    rgba(0,0,0,0.45) 35%,
+    rgba(0,0,0,0.10) 60%,
+    rgba(0,0,0,0) 80%
   );
   z-index: 0;
 }
@@ -1154,7 +1155,7 @@ h2 {
   position: absolute;
   bottom: 0; right: 0;
   width: 120px; height: 120px;
-  background: radial-gradient(ellipse at bottom right, rgba(1,36,11,1) 0%, transparent 70%);
+  background: radial-gradient(ellipse at bottom right, rgba(0,0,0,0.85) 0%, transparent 70%);
   z-index: 2;
   pointer-events: none;
 }
@@ -8143,6 +8144,7 @@ function submitContactForm(e) {
   submitToWorker('contact', fields)
     .then(() => {
       e.target.reset();
+      if (typeof clearContactDraft === 'function') clearContactDraft();
       btn.textContent = 'Send Message'; btn.disabled = false;
       showPage('thanks-contact');
     })
@@ -8484,6 +8486,96 @@ function toggleCardGroup(btn) {
 }
 
 function bookConsult(){ if(window.Calendly){ Calendly.initPopupWidget({url:'https://calendly.com/brantprofessionalservices'}); } else { window.open('https://calendly.com/brantprofessionalservices','_blank','noopener'); } return false; }
+</script>
+
+<script>
+/* ─── CONTACT FORM DRAFT AUTOSAVE (sessionStorage, recovery-only) ──────────
+   Saves what a visitor types into the contact form so a reload or accidental
+   navigation doesn't lose it. Cleared on successful submit. Nothing is sent
+   anywhere — this lives only in the visitor's own browser tab session. */
+(function () {
+  var DRAFT_KEY = 'brant_contact_draft_v1';
+  var TEXT_FIELDS = [
+    'contact-fname','contact-lname','contact-email','contact-phone',
+    'contact-biz','contact-entity','contact-industry','contact-biz-phone',
+    'contact-biz-email','services-other-text','contact-comments'
+  ];
+  var saveTimer = null;
+
+  function collectDraft() {
+    var data = {};
+    TEXT_FIELDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) data[id] = el.value;
+    });
+    // services multi-select checkboxes (store the checked values)
+    var checks = document.querySelectorAll('#services-options input[type="checkbox"]');
+    var services = [];
+    checks.forEach(function (cb) { if (cb.checked) services.push(cb.value); });
+    data._services = services;
+    return data;
+  }
+
+  function saveContactDraft() {
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft()));
+    } catch (e) { /* storage unavailable / full — fail silently */ }
+  }
+
+  function scheduleSave() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveContactDraft, 400);
+  }
+
+  function restoreContactDraft() {
+    var raw;
+    try { raw = sessionStorage.getItem(DRAFT_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    TEXT_FIELDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && data[id] != null && data[id] !== '') el.value = data[id];
+    });
+    if (Array.isArray(data._services) && data._services.length) {
+      var checks = document.querySelectorAll('#services-options input[type="checkbox"]');
+      checks.forEach(function (cb) {
+        if (data._services.indexOf(cb.value) !== -1) cb.checked = true;
+      });
+      // reveal "Other" text box if Other was checked, and refresh the label
+      if (typeof toggleOtherService === 'function') {
+        var otherCb = document.getElementById('services-other-check');
+        if (otherCb && otherCb.checked) toggleOtherService();
+      }
+      if (typeof updateServicesLabel === 'function') updateServicesLabel();
+    }
+  }
+
+  window.clearContactDraft = function () {
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) {}
+  };
+
+  function wire() {
+    // restore first
+    restoreContactDraft();
+    // then attach listeners
+    TEXT_FIELDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', scheduleSave);
+        el.addEventListener('change', scheduleSave);
+      }
+    });
+    var checks = document.querySelectorAll('#services-options input[type="checkbox"]');
+    checks.forEach(function (cb) { cb.addEventListener('change', scheduleSave); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wire);
+  } else {
+    wire();
+  }
+})();
 </script>
 
 </body>
