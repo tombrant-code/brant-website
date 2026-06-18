@@ -1631,43 +1631,8 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
 .deadline-desc  { font-size: 12px; color: var(--color-gray); font-weight: 300; }
 
 /* ─── RESOURCES PAGE ─────────────────────────────────────────────────────── */
-.resources-subnav {
-  background: var(--color-off-white);
-  padding: 11px 5%;
-  border-bottom: 1px solid var(--color-gray-light);
-}
-
-.resources-subnav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-}
-
-.resources-nav-btn {
-  padding: 6px 13px;
-  border-radius: 20px;
-  border: 1px solid var(--color-gray-light);
-  background: var(--color-white);
-  color: var(--color-gray);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Outfit', sans-serif;
-}
-
-.resources-nav-btn:hover,
-.resources-nav-btn.is-active {
-  background: var(--color-green);
-  color: var(--color-white);
-  border-color: var(--color-green);
-}
-
-
 /* Services subnav */
-.services-subnav {
+.page-subnav {
   background: var(--color-green);
   border-bottom: 2px solid rgba(181,162,97,0.35);
   position: sticky;
@@ -1676,7 +1641,7 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
   display: flex;
   align-items: stretch;
 }
-.services-subnav-inner {
+.page-subnav-inner {
   display: flex;
   align-items: stretch;
   min-width: 0;
@@ -1685,8 +1650,8 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.services-subnav-inner::-webkit-scrollbar { display: none; }
-.services-subnav-arrow {
+.page-subnav-inner::-webkit-scrollbar { display: none; }
+.page-subnav-arrow {
   flex-shrink: 0;
   background: rgba(0,0,0,0.18);
   border: none;
@@ -1702,9 +1667,9 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
   padding: 0;
   border-right: 1px solid rgba(255,255,255,0.08);
 }
-.services-subnav-arrow--right { border-right: none; border-left: 1px solid rgba(255,255,255,0.08); }
-.services-subnav-arrow:hover { background: rgba(0,0,0,0.32); }
-.services-nav-btn {
+.page-subnav-arrow--right { border-right: none; border-left: 1px solid rgba(255,255,255,0.08); }
+.page-subnav-arrow:hover { background: rgba(0,0,0,0.32); }
+.page-subnav-btn {
   color: rgba(255,255,255,0.7);
   background: none;
   border: none;
@@ -1720,9 +1685,9 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
   font-family: 'Outfit', sans-serif;
   white-space: nowrap;
 }
-.services-nav-btn:last-child { border-right: none; }
-.services-nav-btn:hover { color: var(--color-white); background: rgba(255,255,255,0.07); }
-.services-nav-btn.is-active {
+.page-subnav-btn:last-child { border-right: none; }
+.page-subnav-btn:hover { color: var(--color-white); background: rgba(255,255,255,0.07); }
+.page-subnav-btn.is-active {
   color: var(--color-gold);
   background: rgba(181,162,97,0.15);
   font-weight: 600;
@@ -2656,13 +2621,9 @@ input[type="date"]:focus { border-color: var(--color-green); }
   .book-card-title { font-size: 12px; }
   .book-card-desc  { font-size: 10px; }
 
-  /* Resources subnav */
-  .resources-subnav { padding: 8px 3%; }
-  .resources-nav-btn { padding: 7px 11px; font-size: 12px; }
-
   /* Services subnav — scrollable ribbon on mobile */
-  .services-nav-btn { font-size: 11px; padding: 0 11px; }
-  .services-subnav-arrow { width: 24px; font-size: 20px; }
+  .page-subnav-btn { font-size: 11px; padding: 0 11px; }
+  .page-subnav-arrow { width: 24px; font-size: 20px; }
 
   /* Forms grid */
   .form-download-card { padding: 10px; gap: 8px; }
@@ -3086,8 +3047,7 @@ input[type="date"]:focus { border-color: var(--color-green); }
   .btn-outline,
   .btn-service,
   .nav-dropdown,
-  .resources-subnav,
-  .services-subnav,
+  .page-subnav,
   .upload-cta,
   .documents-upload-form,
   .upload-disclaimer,
@@ -3581,6 +3541,19 @@ input[type="date"]:focus { border-color: var(--color-green); }
     </p>
   </div>
 
+  <div class="page-subnav" data-page="about">
+    <button class="page-subnav-arrow page-subnav-arrow--left" data-dir="-1" aria-label="Scroll left">&#8249;</button>
+    <div class="page-subnav-inner">
+      <button class="page-subnav-btn is-active" data-target="about-who">Who We Are</button>
+      <button class="page-subnav-btn" data-target="about-approach">Our Approach</button>
+      <button class="page-subnav-btn" data-target="about-serve">Who We Serve</button>
+      <button class="page-subnav-btn" data-target="about-services">What We Offer</button>
+      <button class="page-subnav-btn" data-target="about-why">Why Brant</button>
+      <button class="page-subnav-btn" data-target="about-faq">FAQ</button>
+    </div>
+    <button class="page-subnav-arrow page-subnav-arrow--right" data-dir="1" aria-label="Scroll right">&#8250;</button>
+  </div>
+
   <section>
     <div class="section-inner">
       <div class="about-grid">
@@ -3605,7 +3578,7 @@ input[type="date"]:focus { border-color: var(--color-green); }
             an automated menu. No hold music, no button-pressing to navigate to the right
             department. Our clients talk directly to us, every time.</p>
           </div>
-          <div class="about-block">
+          <div class="about-block" id="about-approach">
             <div class="section-tag">Our Approach</div>
             <h3>We Work Like an Insider.</h3>
             <p>When we&rsquo;re engaged, we get to know the business the way someone on the
@@ -3617,7 +3590,7 @@ input[type="date"]:focus { border-color: var(--color-green); }
             a problem. The goal is to make sure financial decisions are made with the full
             picture in mind.</p>
           </div>
-          <div class="about-block">
+          <div class="about-block" id="about-serve">
             <div class="section-tag">Who We Serve</div>
             <h3>The Right Fit Matters.</h3>
             <p>Our clients tend to be growth-stage and established businesses, entrepreneurs
@@ -3880,23 +3853,23 @@ input[type="date"]:focus { border-color: var(--color-green); }
 
   
 <div class="page" id="page-services">
-  <div class="services-subnav" id="services-subnav">
-    <button class="services-subnav-arrow services-subnav-arrow--left" id="svc-arrow-left" onclick="svcSubnavScroll(-120)" aria-label="Scroll left">&#8249;</button>
-    <div class="services-subnav-inner" id="services-subnav-inner">
-      <button class="services-nav-btn is-active" onclick="scrollToService('svc-01', this)">CFO Services</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-03', this)">Capital Solutions</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-02', this)">Tax &amp; Accounting</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-05', this)">Strategic Advisory</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-11', this)">Compliance</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-10', this)">Due Diligence</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-12', this)">Technology &amp; Systems</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-08', this)">Payroll</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-09', this)">Bookkeeping</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-06', this)">Cross-Functional</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-04', this)">Construction Finance</button>
-      <button class="services-nav-btn" onclick="scrollToService('svc-07', this)">Legal Finance</button>
+  <div class="page-subnav" data-page="services">
+    <button class="page-subnav-arrow page-subnav-arrow--left" data-dir="-1" aria-label="Scroll left">&#8249;</button>
+    <div class="page-subnav-inner">
+      <button class="page-subnav-btn is-active" data-target="svc-01">CFO Services</button>
+      <button class="page-subnav-btn" data-target="svc-03">Capital Solutions</button>
+      <button class="page-subnav-btn" data-target="svc-02">Tax &amp; Accounting</button>
+      <button class="page-subnav-btn" data-target="svc-05">Strategic Advisory</button>
+      <button class="page-subnav-btn" data-target="svc-11">Compliance</button>
+      <button class="page-subnav-btn" data-target="svc-10">Due Diligence</button>
+      <button class="page-subnav-btn" data-target="svc-12">Technology &amp; Systems</button>
+      <button class="page-subnav-btn" data-target="svc-08">Payroll</button>
+      <button class="page-subnav-btn" data-target="svc-09">Bookkeeping</button>
+      <button class="page-subnav-btn" data-target="svc-06">Cross-Functional</button>
+      <button class="page-subnav-btn" data-target="svc-04">Construction Finance</button>
+      <button class="page-subnav-btn" data-target="svc-07">Legal Finance</button>
     </div>
-    <button class="services-subnav-arrow services-subnav-arrow--right" id="svc-arrow-right" onclick="svcSubnavScroll(120)" aria-label="Scroll right">&#8250;</button>
+    <button class="page-subnav-arrow page-subnav-arrow--right" data-dir="1" aria-label="Scroll right">&#8250;</button>
   </div>
   <div class="page-hero">
     <h1 class="animate-fade-up">Financial Consulting &amp; Advisory Services</h1>
@@ -4209,24 +4182,16 @@ input[type="date"]:focus { border-color: var(--color-green); }
     </p>
   </div>
 
-  <div class="resources-subnav">
-    <div class="resources-subnav-inner">
-      <button class="resources-nav-btn is-active" onclick="scrollToResource('forms', this)">
-        &#x1F4C4; Forms
-      </button>
-      <button class="resources-nav-btn" onclick="scrollToResource('deadlines', this)">
-        &#x1F4C5; Tax Deadlines
-      </button>
-      <button class="resources-nav-btn" onclick="scrollToResource('calcs', this)">
-        &#x1F9EE; Calculators
-      </button>
-      <button class="resources-nav-btn" onclick="scrollToResource('books', this)">
-        &#x1F4DA; Books
-      </button>
-      <button class="resources-nav-btn" onclick="scrollToResource('calendar', this)">
-        &#x1F4C8; Economic Calendar
-      </button>
+  <div class="page-subnav" data-page="resources">
+    <button class="page-subnav-arrow page-subnav-arrow--left" data-dir="-1" aria-label="Scroll left">&#8249;</button>
+    <div class="page-subnav-inner">
+      <button class="page-subnav-btn is-active" data-target="res-forms">&#x1F4C4; Forms</button>
+      <button class="page-subnav-btn" data-target="res-deadlines">&#x1F4C5; Tax Deadlines</button>
+      <button class="page-subnav-btn" data-target="res-calcs">&#x1F9EE; Calculators</button>
+      <button class="page-subnav-btn" data-target="res-books">&#x1F4DA; Books</button>
+      <button class="page-subnav-btn" data-target="res-calendar">&#x1F4C8; Economic Calendar</button>
     </div>
+    <button class="page-subnav-arrow page-subnav-arrow--right" data-dir="1" aria-label="Scroll right">&#8250;</button>
   </div>
 
   <!-- FORMS -->
@@ -5275,6 +5240,18 @@ input[type="date"]:focus { border-color: var(--color-green); }
     </div>
   </div>
 
+
+  <div class="page-subnav" data-page="financing">
+    <button class="page-subnav-arrow page-subnav-arrow--left" data-dir="-1" aria-label="Scroll left">&#8249;</button>
+    <div class="page-subnav-inner">
+      <button class="page-subnav-btn is-active" data-target="fin-intro">Overview</button>
+      <button class="page-subnav-btn" data-target="fin-products">Financing Products</button>
+      <button class="page-subnav-btn" data-target="fin-why">Why It Works</button>
+      <button class="page-subnav-btn" data-target="fin-process">The Process</button>
+      <button class="page-subnav-btn" data-target="fin-industries">Industries</button>
+    </div>
+    <button class="page-subnav-arrow page-subnav-arrow--right" data-dir="1" aria-label="Scroll right">&#8250;</button>
+  </div>
 
   <!-- ADVISORY INTRO + STATS -->
   <section id="fin-intro" style="background:var(--bg-surface); scroll-margin-top:120px;">
@@ -6827,96 +6804,88 @@ function goToFinancing() {
   showPage('financing');
 }
 
-// ── RESOURCES SUB-NAV ─────────────────────────────────────────────────────
-function scrollToResource(sectionId, btn) {
-  document.querySelectorAll('.resources-nav-btn').forEach(b => b.classList.remove('is-active'));
-  btn.classList.add('is-active');
-  const el = document.getElementById('res-' + sectionId);
-  if (el) {
-    setTimeout(() => {
-      const top = el.getBoundingClientRect().top + window.scrollY - getHeaderHeight() - 10;
-      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-    }, 50);
-  }
-}
-
-// ── SERVICES SUBNAV — scroll-spy + click nav ─────────────────────────────
-
-// Map svc-id → button index (matches DOM order)
-const SVC_ORDER = ['svc-01','svc-03','svc-02','svc-05','svc-11','svc-10','svc-12','svc-08','svc-09','svc-06','svc-04','svc-07'];
-
-// Set the active subnav button and scroll the strip to keep it visible
-function svcSetActive(serviceId) {
-  const btns = document.querySelectorAll('.services-nav-btn');
-  const idx  = SVC_ORDER.indexOf(serviceId);
-  btns.forEach((b, i) => b.classList.toggle('is-active', i === idx));
-  const inner = document.getElementById('services-subnav-inner');
-  if (inner && idx >= 0) {
-    const btn = btns[idx];
-    if (btn) {
-      // Scroll the strip so the active btn is centred
-      const stripW  = inner.offsetWidth;
-      const btnLeft = btn.offsetLeft;
-      const btnW    = btn.offsetWidth;
-      inner.scrollTo({ left: btnLeft - stripW / 2 + btnW / 2, behavior: 'smooth' });
-    }
-  }
-}
-
-// Click handler — jump to section then update active
-function scrollToService(serviceId, btn) {
-  svcSetActive(serviceId);
-  const el = document.getElementById(serviceId);
-  if (el) {
-    setTimeout(() => {
-      const subnavH = (document.getElementById('services-subnav') || {offsetHeight: 36}).offsetHeight;
-      const top = el.getBoundingClientRect().top + window.scrollY - getHeaderHeight() - subnavH - 8;
-      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-    }, 50);
-  }
-}
-
-// Arrow buttons
-function svcSubnavScroll(delta) {
-  const inner = document.getElementById('services-subnav-inner');
-  if (inner) inner.scrollBy({ left: delta, behavior: 'smooth' });
-}
-
-// Scroll-spy — highlight whichever service entry is nearest the top of the viewport
+// ── PAGE SUBNAV — generic scrollable arrow-ribbon + scroll-spy ────────────
+// Drives every .page-subnav on the site (Services, About, Financing, Resources).
+// Each .page-subnav has data-page="<pageKey>"; each .page-subnav-btn has
+// data-target="<sectionId>"; arrows carry data-dir="-1|1".
 (function() {
-  function svcSpyTick() {
-    const svcPage = document.getElementById('page-services');
-    if (!svcPage || !svcPage.classList.contains('is-active')) return;
-    const headerH = getHeaderHeight();
-    const subnavH = (document.getElementById('services-subnav') || {offsetHeight: 36}).offsetHeight;
-    const threshold = headerH + subnavH + 12;
-    // Walk entries in reverse — last one whose top <= threshold is the "current" section
-    let active = SVC_ORDER[0];
-    for (var i = 0; i < SVC_ORDER.length; i++) {
-      const el = document.getElementById(SVC_ORDER[i]);
-      if (el && el.getBoundingClientRect().top <= threshold) {
-        active = SVC_ORDER[i];
-      }
-    }
-    svcSetActive(active);
+  function headerH() {
+    return (typeof getHeaderHeight === 'function') ? getHeaderHeight() : 0;
   }
 
-  var _svcScrollTicking = false;
-  function onSvcScroll() {
-    if (!_svcScrollTicking) {
-      requestAnimationFrame(function() { svcSpyTick(); _svcScrollTicking = false; });
-      _svcScrollTicking = true;
+  // Highlight one button and recentre the scroll strip on it
+  function setActive(subnav, targetId) {
+    var btns = subnav.querySelectorAll('.page-subnav-btn');
+    var activeBtn = null;
+    btns.forEach(function(b) {
+      var on = b.getAttribute('data-target') === targetId;
+      b.classList.toggle('is-active', on);
+      if (on) activeBtn = b;
+    });
+    var inner = subnav.querySelector('.page-subnav-inner');
+    if (inner && activeBtn) {
+      var stripW = inner.offsetWidth;
+      inner.scrollTo({ left: activeBtn.offsetLeft - stripW / 2 + activeBtn.offsetWidth / 2, behavior: 'smooth' });
     }
+  }
+
+  // Click a tab → set active, then smooth-scroll the section under the sticky bars
+  function scrollToTarget(subnav, targetId) {
+    setActive(subnav, targetId);
+    var el = document.getElementById(targetId);
+    if (!el) return;
+    setTimeout(function() {
+      var top = el.getBoundingClientRect().top + window.scrollY - headerH() - subnav.offsetHeight - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }, 50);
+  }
+
+  // Scroll-spy: last section whose top has passed the threshold is "current"
+  function spyTick(subnav) {
+    var pageKey = subnav.getAttribute('data-page');
+    var page = document.getElementById('page-' + pageKey);
+    if (!page || !page.classList.contains('is-active')) return;
+    var threshold = headerH() + subnav.offsetHeight + 12;
+    var btns = subnav.querySelectorAll('.page-subnav-btn');
+    if (!btns.length) return;
+    var active = btns[0].getAttribute('data-target');
+    btns.forEach(function(b) {
+      var el = document.getElementById(b.getAttribute('data-target'));
+      if (el && el.getBoundingClientRect().top <= threshold) active = b.getAttribute('data-target');
+    });
+    setActive(subnav, active);
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    window.addEventListener('scroll', onSvcScroll, { passive: true });
-    // Wrap showPage to re-run spy when services page opens
+    var subnavs = Array.prototype.slice.call(document.querySelectorAll('.page-subnav'));
+    if (!subnavs.length) return;
+
+    subnavs.forEach(function(subnav) {
+      subnav.addEventListener('click', function(e) {
+        var btn = e.target.closest('.page-subnav-btn');
+        if (btn) { scrollToTarget(subnav, btn.getAttribute('data-target')); return; }
+        var arrow = e.target.closest('.page-subnav-arrow');
+        if (arrow) {
+          var inner = subnav.querySelector('.page-subnav-inner');
+          if (inner) inner.scrollBy({ left: parseInt(arrow.getAttribute('data-dir'), 10) * 120, behavior: 'smooth' });
+        }
+      });
+    });
+
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(function() { subnavs.forEach(spyTick); ticking = false; });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Re-run spy when a page becomes active via showPage()
     var orig = window.showPage;
     if (orig) {
       window.showPage = function(name) {
         orig(name);
-        if (name === 'services') { setTimeout(svcSpyTick, 120); }
+        setTimeout(function() { subnavs.forEach(spyTick); }, 120);
       };
     }
   });
