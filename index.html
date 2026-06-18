@@ -1644,6 +1644,7 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
 .page-subnav-inner {
   display: flex;
   align-items: stretch;
+  justify-content: safe center;
   min-width: 0;
   flex: 1;
   overflow-x: auto;
@@ -1651,6 +1652,8 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
   scrollbar-width: none;
 }
 .page-subnav-inner::-webkit-scrollbar { display: none; }
+/* When the strip doesn't overflow, the scroll arrows are pointless — hide them */
+.page-subnav.is-fitted .page-subnav-arrow { display: none; }
 .page-subnav-arrow {
   flex-shrink: 0;
   background: rgba(0,0,0,0.18);
@@ -6856,6 +6859,15 @@ function goToFinancing() {
     setActive(subnav, active);
   }
 
+  // Toggle .is-fitted when the strip's content fits without scrolling
+  // (centers the tabs + hides the now-useless arrows). Overflow → scrollable.
+  function refreshFit(subnav) {
+    var inner = subnav.querySelector('.page-subnav-inner');
+    if (!inner) return;
+    var fits = inner.scrollWidth <= inner.clientWidth + 1;
+    subnav.classList.toggle('is-fitted', fits);
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     var subnavs = Array.prototype.slice.call(document.querySelectorAll('.page-subnav'));
     if (!subnavs.length) return;
@@ -6880,12 +6892,21 @@ function goToFinancing() {
       }
     }, { passive: true });
 
-    // Re-run spy when a page becomes active via showPage()
+    // Recompute fit on load and whenever the viewport width changes
+    function refreshAllFit() { subnavs.forEach(refreshFit); }
+    refreshAllFit();
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(refreshAllFit, 150);
+    });
+
+    // Re-run spy + fit when a page becomes active via showPage()
     var orig = window.showPage;
     if (orig) {
       window.showPage = function(name) {
         orig(name);
-        setTimeout(function() { subnavs.forEach(spyTick); }, 120);
+        setTimeout(function() { subnavs.forEach(spyTick); refreshAllFit(); }, 120);
       };
     }
   });
