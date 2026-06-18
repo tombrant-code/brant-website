@@ -1652,8 +1652,10 @@ a.home-connect-item:hover .home-connect-value { color: var(--color-gold); }
   scrollbar-width: none;
 }
 .page-subnav-inner::-webkit-scrollbar { display: none; }
-/* When the strip doesn't overflow, the scroll arrows are pointless — hide them */
+/* When the strip doesn't overflow, the scroll arrows are pointless — hide them
+   and stretch the tabs to equal widths spanning the full bar. */
 .page-subnav.is-fitted .page-subnav-arrow { display: none; }
+.page-subnav.is-fitted .page-subnav-btn { flex: 1 1 0; }
 .page-subnav-arrow {
   flex-shrink: 0;
   background: rgba(0,0,0,0.18);
