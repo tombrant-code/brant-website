@@ -1,0 +1,159 @@
+# Brant Professional Services — URL restructure redirects
+# Cloudflare Pages reads this file natively. Format: source  destination  status
+#
+# Strategy: pattern-based 301s catch all 1,440 old /services/* URLs and route
+# them to the nearest survivor in the new architecture. More specific patterns
+# come first; broadest fallback last.
+
+# ── Cannabis-specific location pages → cannabis vertical ─────────────────
+/services/cannabis-*  /verticals/cannabis/  301
+/services/*-cannabis  /verticals/cannabis/  301
+
+# ── Long Island towns (Nassau + Suffolk) → Long Island region ────────────
+# Nassau County
+/services/*-hempstead       /regions/long-island/  301
+/services/*-freeport         /regions/long-island/  301
+/services/*-long-beach       /regions/long-island/  301
+/services/*-glen-cove        /regions/long-island/  301
+/services/*-garden-city      /regions/long-island/  301
+/services/*-rockville-centre /regions/long-island/  301
+/services/*-mineola          /regions/long-island/  301
+/services/*-westbury         /regions/long-island/  301
+/services/*-hicksville       /regions/long-island/  301
+/services/*-levittown        /regions/long-island/  301
+/services/*-massapequa       /regions/long-island/  301
+/services/*-plainview        /regions/long-island/  301
+/services/*-syosset          /regions/long-island/  301
+/services/*-jericho          /regions/long-island/  301
+/services/*-roslyn           /regions/long-island/  301
+/services/*-port-washington  /regions/long-island/  301
+/services/*-great-neck       /regions/long-island/  301
+/services/*-manhasset        /regions/long-island/  301
+/services/*-oyster-bay       /regions/long-island/  301
+/services/*-bethpage         /regions/long-island/  301
+/services/*-farmingdale      /regions/long-island/  301
+/services/*-valley-stream    /regions/long-island/  301
+/services/*-lynbrook         /regions/long-island/  301
+/services/*-merrick          /regions/long-island/  301
+/services/*-bellmore         /regions/long-island/  301
+/services/*-wantagh          /regions/long-island/  301
+/services/*-seaford          /regions/long-island/  301
+/services/*-uniondale        /regions/long-island/  301
+/services/*-baldwin          /regions/long-island/  301
+/services/*-floral-park      /regions/long-island/  301
+# Suffolk County
+/services/*-huntington       /regions/long-island/  301
+/services/*-smithtown        /regions/long-island/  301
+/services/*-islip            /regions/long-island/  301
+/services/*-babylon          /regions/long-island/  301
+/services/*-brookhaven       /regions/long-island/  301
+/services/*-southampton      /regions/long-island/  301
+/services/*-east-hampton     /regions/long-island/  301
+/services/*-montauk          /regions/long-island/  301
+/services/*-riverhead        /regions/long-island/  301
+/services/*-patchogue        /regions/long-island/  301
+/services/*-bay-shore        /regions/long-island/  301
+/services/*-commack          /regions/long-island/  301
+/services/*-deer-park        /regions/long-island/  301
+/services/*-stony-brook      /regions/long-island/  301
+/services/*-port-jefferson   /regions/long-island/  301
+/services/*-ronkonkoma       /regions/long-island/  301
+/services/*-lindenhurst      /regions/long-island/  301
+/services/*-amityville       /regions/long-island/  301
+/services/*-west-babylon     /regions/long-island/  301
+/services/*-north-babylon    /regions/long-island/  301
+/services/*-east-northport   /regions/long-island/  301
+/services/*-northport        /regions/long-island/  301
+/services/*-kings-park       /regions/long-island/  301
+/services/*-centereach       /regions/long-island/  301
+/services/*-selden           /regions/long-island/  301
+/services/*-medford          /regions/long-island/  301
+/services/*-shirley          /regions/long-island/  301
+/services/*-mastic           /regions/long-island/  301
+/services/*-center-moriches  /regions/long-island/  301
+/services/*-westhampton      /regions/long-island/  301
+/services/*-sag-harbor       /regions/long-island/  301
+/services/*-bridgehampton    /regions/long-island/  301
+/services/*-amagansett       /regions/long-island/  301
+/services/*-greenport        /regions/long-island/  301
+/services/*-southold         /regions/long-island/  301
+/services/*-mattituck        /regions/long-island/  301
+/services/*-cutchogue        /regions/long-island/  301
+
+# ── NYC boroughs → NYC region ────────────────────────────────────────────
+/services/*-manhattan        /regions/nyc/  301
+/services/*-brooklyn         /regions/nyc/  301
+/services/*-queens           /regions/nyc/  301
+/services/*-bronx            /regions/nyc/  301
+/services/*-staten-island    /regions/nyc/  301
+/services/*-harlem           /regions/nyc/  301
+/services/*-midtown          /regions/nyc/  301
+/services/*-downtown         /regions/nyc/  301
+/services/*-tribeca          /regions/nyc/  301
+/services/*-soho             /regions/nyc/  301
+/services/*-flushing         /regions/nyc/  301
+/services/*-astoria          /regions/nyc/  301
+/services/*-long-island-city /regions/nyc/  301
+/services/*-williamsburg     /regions/nyc/  301
+/services/*-park-slope       /regions/nyc/  301
+/services/*-bay-ridge        /regions/nyc/  301
+/services/*-bushwick         /regions/nyc/  301
+
+# ── Capital Region towns → Capital Region ────────────────────────────────
+/services/*-albany           /regions/capital-region/  301
+/services/*-troy             /regions/capital-region/  301
+/services/*-schenectady      /regions/capital-region/  301
+/services/*-saratoga-springs /regions/capital-region/  301
+/services/*-saratoga         /regions/capital-region/  301
+/services/*-clifton-park     /regions/capital-region/  301
+/services/*-colonie          /regions/capital-region/  301
+/services/*-guilderland      /regions/capital-region/  301
+/services/*-bethlehem        /regions/capital-region/  301
+/services/*-rensselaer       /regions/capital-region/  301
+
+# ── Adirondack towns → Adirondacks region ────────────────────────────────
+/services/*-lake-george      /regions/adirondacks/  301
+/services/*-lake-placid      /regions/adirondacks/  301
+/services/*-saranac-lake     /regions/adirondacks/  301
+/services/*-tupper-lake      /regions/adirondacks/  301
+/services/*-old-forge        /regions/adirondacks/  301
+/services/*-warrensburg      /regions/adirondacks/  301
+/services/*-bolton-landing   /regions/adirondacks/  301
+/services/*-ticonderoga      /regions/adirondacks/  301
+/services/*-glens-falls      /regions/adirondacks/  301
+/services/*-queensbury       /regions/adirondacks/  301
+
+# ── Other NY cities (upstate, fallback to NY state page) ─────────────────
+/services/*-buffalo          /states/new-york/  301
+/services/*-rochester        /states/new-york/  301
+/services/*-syracuse         /states/new-york/  301
+/services/*-utica            /states/new-york/  301
+/services/*-binghamton       /states/new-york/  301
+/services/*-yonkers          /states/new-york/  301
+/services/*-white-plains     /states/new-york/  301
+/services/*-new-rochelle     /states/new-york/  301
+/services/*-mount-vernon     /states/new-york/  301
+/services/*-poughkeepsie     /states/new-york/  301
+/services/*-newburgh         /states/new-york/  301
+/services/*-kingston         /states/new-york/  301
+/services/*-ithaca           /states/new-york/  301
+/services/*-niagara-falls    /states/new-york/  301
+/services/*-elmira           /states/new-york/  301
+/services/*-jamestown        /states/new-york/  301
+
+# ── Final catch-all: anything still under /services/* → national ─────────
+# This catches the ~612 general national location pages that don't match
+# any specific pattern above, plus any town we missed.
+/services/*                  /national/  301
+
+# ── Legacy category indexes ──────────────────────────────────────────────
+/services/                   /national/  301
+/services                    /national/  301
+
+# ── Old single-page anchors (kept working for backlinks) ─────────────────
+# These pass through to the SPA homepage with the hash — the SPA's hash
+# handler routes to the right page. No redirect needed; listing them here
+# as documentation only. Cloudflare doesn't redirect same-origin hashes.
+
+# ── Sitemap convenience ──────────────────────────────────────────────────
+/sitemap                     /sitemap.xml  301
