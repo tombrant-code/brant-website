@@ -138,27 +138,9 @@
   .hero {
     padding: 64px 0 72px;
     border-bottom: 1px solid var(--line);
-    position: relative;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 60% 80% at 85% 10%, rgba(181,162,97,0.10), transparent 60%),
-      radial-gradient(ellipse 70% 60% at 0% 100%, rgba(27,76,44,0.045), transparent 60%),
-      var(--white);
+    background: var(--white);
   }
-  .hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: repeating-linear-gradient(
-      135deg,
-      transparent 0,
-      transparent 38px,
-      rgba(27,76,44,0.018) 38px,
-      rgba(27,76,44,0.018) 39px
-    );
-    pointer-events: none;
-  }
-  .hero .container { position: relative; z-index: 1; }
+  .hero .container { position: relative; }
   .hero .eyebrow {
     display:inline-block;
     font-size: 0.78rem;
@@ -455,29 +437,23 @@
     color: var(--white);
     padding: 84px 0;
     text-align:center;
-    position: relative;
-    overflow: hidden;
   }
-  .cta-final::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 50% 80% at 50% 0%, rgba(181,162,97,0.22), transparent 60%),
-      radial-gradient(ellipse 40% 60% at 90% 100%, rgba(181,162,97,0.12), transparent 60%);
-    pointer-events: none;
+  .cta-final .lockup-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.6rem, 2.4vw, 1.9rem);
+    color: var(--white);
+    font-weight: 400;
+    margin: 0 0 10px;
+    line-height: 1.2;
   }
-  .cta-final::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: repeating-linear-gradient(
-      135deg, transparent 0, transparent 38px,
-      rgba(255,255,255,0.025) 38px, rgba(255,255,255,0.025) 39px
-    );
-    pointer-events: none;
+  .cta-final .lockup-est {
+    font-size: 0.78rem;
+    color: var(--gold);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 0 0 36px;
   }
-  .cta-final .container { position: relative; z-index: 1; }
   .cta-final h2 { color: var(--white); margin-bottom: 14px; font-size: clamp(1.7rem, 3vw, 2.2rem); }
   .cta-final h2::after {
     content: "";
@@ -800,6 +776,8 @@
 
 <section class="cta-final" id="contact">
   <div class="container">
+    <p class="lockup-name">Brant Professional Services Inc.</p>
+    <p class="lockup-est">Est. 2021 · New York, USA</p>
     <h2>Tell us what you need.</h2>
     <p>No cost. No commitment. A straight answer on whether and how we can help — and what it would cost.</p>
     <div class="cta-row" style="justify-content:center; display:flex; gap:14px; flex-wrap:wrap;">
