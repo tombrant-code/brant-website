@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <!-- ═══ PRIMARY META TAGS ═══ -->
-  <!-- BUILD-2026-06-26-v28-site-audit -->
+  <!-- BUILD-2026-06-26-v30-pdf-attachment -->
 <title>Brant Professional Services Inc. | Financial Consulting &amp; Advisory | New York</title>
   <link rel="icon" type="image/jpeg" href="assets/img/logo.jpg"/>
   <link rel="apple-touch-icon" href="assets/img/logo.jpg"/>
@@ -8204,6 +8204,274 @@ function submitContactForm(e) {
     });
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// Financing Application PDF generator (client-side, browser-rendered)
+// Loads jsPDF lazily on first use. Produces a single-page PDF matching
+// the Brant letterhead layout, returned as base64 for Worker attachment.
+// ─────────────────────────────────────────────────────────────────────
+let _jsPDFPromise = null;
+function loadJsPDF() {
+  if (_jsPDFPromise) return _jsPDFPromise;
+  _jsPDFPromise = new Promise((resolve, reject) => {
+    if (window.jspdf) return resolve(window.jspdf.jsPDF);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = () => resolve(window.jspdf.jsPDF);
+    s.onerror = () => reject(new Error('jsPDF load failed'));
+    document.head.appendChild(s);
+  });
+  return _jsPDFPromise;
+}
+
+let _letterheadPromise = null;
+function loadLetterheadDataURL() {
+  if (_letterheadPromise) return _letterheadPromise;
+  _letterheadPromise = fetch('assets/img/letterhead.png')
+    .then(r => r.blob())
+    .then(b => new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = rej;
+      fr.readAsDataURL(b);
+    }))
+    .catch(() => null);
+  return _letterheadPromise;
+}
+
+// PDF layout constants — mirror Python build_pdf.py
+const _PDF = {
+  pageW: 612, pageH: 792,         // Letter size in points
+  mL: 36, mR: 36, mT: 25, mB: 25,
+  green: '#1B4C2C', gold: '#B5A261', black: '#1A1A1A', grey: '#888888', line: '#CCCCCC',
+};
+
+async function buildFinancingApplicationPDF(fields, signatureDataUrl) {
+  const jsPDF = await loadJsPDF();
+  const letterhead = await loadLetterheadDataURL();
+  const doc = new jsPDF({ unit: 'pt', format: 'letter', compress: true });
+
+  const P = _PDF;
+  const contentW = P.pageW - P.mL - P.mR;
+
+  // ── Header (letterhead image) ──
+  if (letterhead) {
+    const imgW = 4.6 * 72;   // 4.6 inches
+    const imgH = imgW / (1094 / 346);
+    const imgX = (P.pageW - imgW) / 2;
+    doc.addImage(letterhead, 'PNG', imgX, P.mT, imgW, imgH, undefined, 'FAST');
+    var y = P.mT + imgH + 4;
+  } else {
+    doc.setTextColor(P.green); doc.setFont('times', 'bold'); doc.setFontSize(16);
+    doc.text('Brant Professional Services Inc.', P.pageW / 2, P.mT + 16, { align: 'center' });
+    var y = P.mT + 26;
+  }
+
+  // Title
+  doc.setTextColor(P.green); doc.setFont('times', 'bold'); doc.setFontSize(16);
+  doc.text('FINANCING APPLICATION', P.pageW / 2, y + 12, { align: 'center' });
+  doc.setTextColor(P.grey); doc.setFont('helvetica', 'italic'); doc.setFontSize(8);
+  doc.text('Confidential — for financing evaluation only  ·  brantprofessionalservices.com  ·  (516) 655-6910', P.pageW / 2, y + 24, { align: 'center' });
+  y += 34;
+
+  // Helpers
+  const sectionHeading = (label) => {
+    doc.setTextColor(P.green); doc.setFont('times', 'bold'); doc.setFontSize(11);
+    doc.text(label.toUpperCase(), P.mL, y);
+    doc.setDrawColor(P.green); doc.setLineWidth(0.6);
+    doc.line(P.mL, y + 5, P.mL + contentW, y + 5);
+    y += 15;
+  };
+
+  const fieldRow = (items) => {
+    const n = items.length;
+    const gap = 8;
+    const usableW = contentW - gap * (n - 1);
+    // Labels
+    let x = P.mL;
+    doc.setTextColor(P.grey); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+    items.forEach(it => {
+      doc.text(it.label.toUpperCase(), x, y + 7);
+      x += usableW * it.frac + gap;
+    });
+    // Field boxes
+    x = P.mL;
+    const fieldY = y + 11;
+    const fieldH = 16;
+    doc.setDrawColor(P.line); doc.setLineWidth(0.6);
+    items.forEach(it => {
+      const w = usableW * it.frac;
+      doc.rect(x, fieldY, w, fieldH);
+      const val = (it.value || '').toString();
+      if (val) {
+        doc.setTextColor(P.black); doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+        // Truncate to fit
+        let txt = val;
+        while (doc.getTextWidth(txt) > w - 6 && txt.length > 4) txt = txt.slice(0, -1);
+        if (txt !== val) txt = txt.slice(0, -3) + '...';
+        doc.text(txt, x + 3, fieldY + 11);
+      }
+      x += w + gap;
+    });
+    y += 34;
+  };
+
+  // Split address strings back into components for boxes
+  const splitAddr = (full) => {
+    if (!full) return { street: '', city: '', state: '', zip: '' };
+    const parts = full.split(',').map(s => s.trim());
+    const street = parts[0] || '';
+    const city = parts[1] || '';
+    const tail = (parts[2] || '') + (parts[3] ? ' ' + parts[3] : '');
+    const m = tail.match(/^([A-Z]{2})\s*(.*)$/i);
+    return { street, city, state: m ? m[1] : tail, zip: m ? m[2].trim() : '' };
+  };
+  const home = splitAddr(fields.home_address);
+  const biz  = splitAddr(fields.business_address);
+  const stateZip = (s, z) => [s, z].filter(Boolean).join(' ');
+  const [ownerFname, ...ownerRest] = (fields.user_name || '').split(' ');
+  const ownerLname = ownerRest.join(' ');
+
+  // ── Financing Request ──
+  sectionHeading('Financing Request');
+  fieldRow([
+    { label: 'Amount Requested ($)', frac: 0.50, value: fields.amount_requested },
+    { label: 'Avg Monthly Revenue ($)', frac: 0.50, value: fields.monthly_revenue },
+  ]);
+  fieldRow([
+    { label: 'Use of Funds', frac: 1.0, value: fields.financing_purpose },
+  ]);
+
+  // ── Owner / Officer ──
+  sectionHeading('Owner / Officer');
+  fieldRow([
+    { label: 'First Name',    frac: 0.30, value: ownerFname },
+    { label: 'Last Name',     frac: 0.30, value: ownerLname },
+    { label: 'Date of Birth', frac: 0.20, value: fields.owner_dob },
+    { label: 'SSN',           frac: 0.20, value: fields.owner_ssn },
+  ]);
+  fieldRow([
+    { label: 'Email',         frac: 0.45, value: fields.user_email },
+    { label: 'Mobile Phone',  frac: 0.30, value: fields.user_phone },
+    { label: 'Ownership %',   frac: 0.25, value: fields.ownership_pct },
+  ]);
+  fieldRow([
+    { label: 'Home Address',  frac: 0.55, value: home.street },
+    { label: 'City',          frac: 0.25, value: home.city },
+    { label: 'State / ZIP',   frac: 0.20, value: stateZip(home.state, home.zip) },
+  ]);
+
+  // ── Business ──
+  sectionHeading('Business');
+  fieldRow([
+    { label: 'Legal Business Name', frac: 0.55, value: fields.business_name },
+    { label: 'DBA',                 frac: 0.25, value: fields.business_dba },
+    { label: 'Entity Type',         frac: 0.20, value: fields.business_type },
+  ]);
+  fieldRow([
+    { label: 'EIN',            frac: 0.22, value: fields.ein },
+    { label: 'Business Phone', frac: 0.22, value: fields.business_phone },
+    { label: 'State of Inc.',  frac: 0.14, value: fields.state_incorporated },
+    { label: 'Start Date',     frac: 0.16, value: fields.start_date },
+    { label: 'Industry',       frac: 0.26, value: fields.industry },
+  ]);
+  fieldRow([
+    { label: 'Business Address', frac: 0.55, value: biz.street },
+    { label: 'City',             frac: 0.25, value: biz.city },
+    { label: 'State / ZIP',      frac: 0.20, value: stateZip(biz.state, biz.zip) },
+  ]);
+
+  // ── Existing Advances ──
+  sectionHeading('Existing Advances / Outstanding Financing');
+  doc.setTextColor(P.grey); doc.setFont('helvetica', 'italic'); doc.setFontSize(7);
+  doc.text('List lender, balance, and payment terms — leave blank if none.', P.mL, y + 4);
+  doc.setDrawColor(P.line); doc.setLineWidth(0.6);
+  doc.rect(P.mL, y + 8, contentW, 22);
+  const advText = (fields.existing_advances && fields.existing_advances !== 'None reported') ? fields.existing_advances : '';
+  if (advText) {
+    doc.setTextColor(P.black); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    const wrapped = doc.splitTextToSize(advText, contentW - 6).slice(0, 2);
+    wrapped.forEach((line, i) => doc.text(line, P.mL + 3, y + 18 + (i * 10)));
+  }
+  y += 38;
+
+  // ── Consent & Authorization ──
+  sectionHeading('Consent & Authorization');
+  const esign = '1. ELECTRONIC SIGNATURE CONSENT — I acknowledge that I have chosen to do business electronically and authorize the use of an electronic signature, which carries the same legal weight as an ink signature. I agree to the Terms & Conditions and consent to receive communications via phone, email, and SMS. Message and data rates may apply.';
+  const auth = '2. AUTHORIZATION & CREDIT CONSENT — Applicant represents and agrees that (1) all information provided is true, accurate, and complete; (2) Applicant will immediately notify Brant Professional Services Inc. of any change in financial condition; (3) Applicant waives claims against Brant and Recipients relating to information release; (4) signatory is authorized to sign on behalf of Merchant; (5) Applicant consents to receive calls, texts, emails or mail from Brant or Recipients; (6) Applicant authorizes Brant to transmit this application to any/all Recipients; (7) Applicant consents to release by any creditor or financial institution of any information to Brant and Recipients. Valid 120 days unless revoked in writing. Brant and its designees including third-party lenders ("Recipients") may request and receive investigative and credit reports including hard credit inquiries. FINANCING TERMS: Brant is a financing advisory and facilitator, not a direct or SBA lender. All financing offers originate from third-party funders/lenders who set rates, terms, and approval decisions. Nothing herein is an offer, commitment, or guarantee of financing. Submitting this application does not obligate Applicant to accept any offer.';
+
+  doc.setTextColor(P.black); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6);
+  const esignLines = doc.splitTextToSize(esign, contentW);
+  esignLines.forEach(l => { doc.text(l, P.mL, y); y += 9; });
+  y += 3;
+  const authLines = doc.splitTextToSize(auth, contentW);
+  authLines.forEach(l => { doc.text(l, P.mL, y); y += 9; });
+  y += 4;
+
+  // Consent checkboxes
+  const esignChecked = (fields.consent_esign === 'Yes' || fields.consent_esign === 'Agreed');
+  const authChecked  = (fields.consent_auth  === 'Yes' || fields.consent_auth  === 'Agreed');
+  const drawCheckbox = (cx, cy, checked) => {
+    doc.setDrawColor(P.black); doc.setLineWidth(0.7);
+    doc.rect(cx, cy, 8, 8);
+    if (checked) {
+      doc.setFillColor(P.green); doc.rect(cx + 0.5, cy + 0.5, 7, 7, 'F');
+      doc.setTextColor('#FFFFFF'); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+      doc.text('X', cx + 4, cy + 6, { align: 'center' });
+    }
+  };
+  drawCheckbox(P.mL, y - 7, esignChecked);
+  doc.setTextColor(P.black); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+  doc.text('I agree to the Electronic Signature Consent (#1).', P.mL + 12, y);
+  drawCheckbox(P.mL + contentW / 2, y - 7, authChecked);
+  doc.text('I agree to the Authorization & Credit Consent (#2).', P.mL + contentW / 2 + 12, y);
+  y += 18;
+
+  // ── Signature row ──
+  const sigW = contentW * 0.55;
+  const dateW = contentW * 0.20;
+  const nameW = contentW * 0.20;
+  const sigGap = 6;
+  const sigX = P.mL;
+  const nameX = P.mL + sigW + sigGap;
+  const dateX = nameX + nameW + sigGap;
+  const sigH = 28;
+
+  doc.setDrawColor(P.line); doc.setLineWidth(0.6);
+  doc.rect(sigX, y, sigW, sigH);
+  doc.rect(nameX, y, nameW, sigH);
+  doc.rect(dateX, y, dateW, sigH);
+
+  // Signature image
+  if (signatureDataUrl && signatureDataUrl.startsWith('data:image')) {
+    try {
+      doc.addImage(signatureDataUrl, 'PNG', sigX + 2, y + 1, sigW - 4, sigH - 2, undefined, 'FAST');
+    } catch (e) { console.warn('signature embed failed', e); }
+  }
+
+  // Print name + date values
+  doc.setTextColor(P.black); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  doc.text(fields.user_name || '', nameX + 3, y + 17);
+  doc.text(fields.signature_date || '', dateX + 3, y + 17);
+
+  // Labels under boxes
+  doc.setTextColor(P.black); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+  doc.text('APPLICANT SIGNATURE', sigX,  y + sigH + 8);
+  doc.text('PRINT NAME',          nameX, y + sigH + 8);
+  doc.text('DATE',                dateX, y + sigH + 8);
+
+  // Submission footnote
+  doc.setTextColor(P.grey); doc.setFont('helvetica', 'italic'); doc.setFontSize(6);
+  doc.text('Submitted electronically via brantprofessionalservices.com. Consent text above is the verbatim language displayed to the applicant at time of submission.',
+            P.mL, y + sigH + 20);
+  doc.setFont('helvetica', 'bold');
+  const ts = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'long', timeStyle: 'short' });
+  doc.text(`Submission timestamp (ET): ${ts}`, P.mL, y + sigH + 32);
+
+  // Return base64 (strip "data:application/pdf;base64," prefix)
+  const dataUri = doc.output('datauristring');
+  return dataUri.split(',')[1] || '';
+}
+
 function submitFinancingForm(e) {
   e.preventDefault();
   const btn = e.target.querySelector('.btn-primary, button[type="submit"]');
@@ -8288,25 +8556,32 @@ function submitFinancingForm(e) {
     consent_auth:       document.getElementById('consent-auth')?.checked ? 'Yes' : 'No',
     signature_date:     document.getElementById('signature-date')?.value || '',
     signature_provided: (typeof getSignatureDataURL === 'function' && getSignatureDataURL()) ? 'Yes (signed electronically)' : 'No',
+    signature_image:    (typeof getSignatureDataURL === 'function') ? (getSignatureDataURL() || '') : '',
   };
 
-  submitToWorker('financing', fields)
-    .then(() => {
-      if (typeof gtag === 'function') {
-        const amtNum = parseFloat((fields.amount_requested || '').replace(/[^0-9.]/g, ''));
-        gtag('event', 'generate_lead', {
-          currency: 'USD',
-          value: isNaN(amtNum) ? 0 : amtNum,
-          lead_stage: 'full-application',
-        });
-      }
-      window.lastFinancingApplicant = {
-        user_name:     fields.user_name,
-        user_email:    fields.user_email,
-        user_phone:    fields.user_phone,
-        business_name: fields.business_name,
-        submitted_at:  new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
-      };
+  // Build PDF in-browser (gracefully degrade if jsPDF fails to load)
+  const sigDataUrl = (typeof getSignatureDataURL === 'function') ? (getSignatureDataURL() || '') : '';
+  buildFinancingApplicationPDF(fields, sigDataUrl)
+    .then(pdfB64 => { fields.application_pdf = pdfB64; })
+    .catch(err => { console.warn('[PDF-BUILD-FAILED]', err); })
+    .finally(() => {
+      submitToWorker('financing', fields)
+        .then(() => {
+          if (typeof gtag === 'function') {
+            const amtNum = parseFloat((fields.amount_requested || '').replace(/[^0-9.]/g, ''));
+            gtag('event', 'generate_lead', {
+              currency: 'USD',
+              value: isNaN(amtNum) ? 0 : amtNum,
+              lead_stage: 'full-application',
+            });
+          }
+          window.lastFinancingApplicant = {
+            user_name:     fields.user_name,
+            user_email:    fields.user_email,
+            user_phone:    fields.user_phone,
+            business_name: fields.business_name,
+            submitted_at:  new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
+          };
       e.target.reset();
       // Reset product selector
       window._selectedFinancingProducts = [];
@@ -8323,6 +8598,7 @@ function submitFinancingForm(e) {
     .catch((err) => {
       btn.textContent = 'Submit Financing Application'; btn.disabled = false;
       alert('There was a problem submitting your application. Please try again or call us at (516) 655-6910.');
+    });
     });
 }
 
