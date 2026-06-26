@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <!-- ═══ PRIMARY META TAGS ═══ -->
-  <!-- BUILD-2026-06-09-v19-session7 -->
+  <!-- BUILD-2026-06-25-v20-lane2-fixes -->
 <title>Brant Professional Services Inc. | Financial Consulting &amp; Advisory | New York</title>
   <link rel="icon" type="image/jpeg" href="assets/img/logo.jpg"/>
   <link rel="apple-touch-icon" href="assets/img/logo.jpg"/>
@@ -47,8 +47,7 @@
   "@context": "https://schema.org",
   "@type": [
     "ProfessionalService",
-    "FinancialService",
-    "AccountingService"
+    "FinancialService"
   ],
   "@id": "https://brantprofessionalservices.com/#organization",
   "name": "Brant Professional Services Inc.",
@@ -102,7 +101,10 @@
     "addressRegion": "NY",
     "addressCountry": "US"
   },
-  "sameAs": [],
+  "sameAs": [
+    "https://www.linkedin.com/company/brantprofessionalservices/",
+    "https://www.alignable.com/wantagh-ny/brant-professional-services-inc"
+  ],
   "knowsAbout": [
     "Fractional CFO Services",
     "Tax Preparation and Planning",
@@ -3412,7 +3414,7 @@ input[type="date"]:focus { border-color: var(--color-green); }
         <span class="logo-meta">Est. 2021 &nbsp;&middot;&nbsp; New York, USA</span>
       </div>
     </div>
-    <button class="hamburger" id="hamburger-btn" onclick="toggleNav()">
+    <button class="hamburger" id="hamburger-btn" onclick="toggleNav()" aria-label="Toggle navigation menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -6557,21 +6559,61 @@ async function submitLeadCapture() {
   const amount = document.getElementById('fls-amount').value.trim();
   const err    = document.getElementById('fls-error');
 
-  if (!fname || !lname || !email || !phone || !amount) {
-    err.textContent = 'Please complete all required fields.';
+  function showErr(msg) {
+    err.textContent = msg;
     err.style.display = 'block';
+  }
+
+  if (!fname || !lname || !email || !phone || !amount) {
+    showErr('Please complete all required fields.');
+    return;
+  }
+  // Email format check
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    showErr('Please enter a valid email address.');
+    return;
+  }
+  // Phone: require at least 10 digits
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length < 10) {
+    showErr('Please enter a valid 10-digit phone number.');
+    return;
+  }
+  // Amount: must be numeric and at least $10,000
+  const amountNum = parseFloat(amount.replace(/[^0-9.]/g, ''));
+  if (isNaN(amountNum) || amountNum < 10000) {
+    showErr('Please enter an amount of at least $10,000.');
     return;
   }
   err.style.display = 'none';
 
-  // Fire lead to Worker immediately — don't await, don't block UX
-  submitToWorker('financing-lead', {
+  // Fire lead to Worker immediately — don't await, don't block UX.
+  // On failure, save to localStorage so the lead isn't lost.
+  const leadPayload = {
     user_name:  fname + ' ' + lname,
     user_email: email,
     user_phone: phone,
     amount:     amount,
     lead_stage: 'step-1-only',
-  }).catch(function() {});
+    captured_at: new Date().toISOString(),
+  };
+  submitToWorker('financing-lead', leadPayload).catch(function(submitErr) {
+    console.error('[LEAD-CAPTURE-FAILED]', submitErr, leadPayload);
+    try {
+      const pending = JSON.parse(localStorage.getItem('bps_pending_leads') || '[]');
+      pending.push(leadPayload);
+      localStorage.setItem('bps_pending_leads', JSON.stringify(pending));
+    } catch (e) { /* localStorage unavailable, fail silent */ }
+  });
+
+  // GA4 event
+  if (typeof gtag === 'function') {
+    gtag('event', 'generate_lead', {
+      currency: 'USD',
+      value: amountNum,
+      lead_stage: 'step-1',
+    });
+  }
 
   // Pre-fill matching fields in the full form
   var map = {
@@ -8141,6 +8183,9 @@ function submitContactForm(e) {
 
   submitToWorker('contact', fields)
     .then(() => {
+      if (typeof gtag === 'function') {
+        gtag('event', 'contact_submit', { method: 'website_form' });
+      }
       e.target.reset();
       if (typeof clearContactDraft === 'function') clearContactDraft();
       btn.textContent = 'Send Message'; btn.disabled = false;
@@ -8240,6 +8285,14 @@ function submitFinancingForm(e) {
 
   submitToWorker('financing', fields)
     .then(() => {
+      if (typeof gtag === 'function') {
+        const amtNum = parseFloat((fields.amount_requested || '').replace(/[^0-9.]/g, ''));
+        gtag('event', 'generate_lead', {
+          currency: 'USD',
+          value: isNaN(amtNum) ? 0 : amtNum,
+          lead_stage: 'full-application',
+        });
+      }
       window.lastFinancingApplicant = {
         user_name:     fields.user_name,
         user_email:    fields.user_email,
@@ -8436,6 +8489,9 @@ function submitPartnerForm(e) {
 
   submitToWorker('partner', fields)
     .then(() => {
+      if (typeof gtag === 'function') {
+        gtag('event', 'partner_signup', { method: 'website_form' });
+      }
       e.target.reset();
       btn.textContent = 'Submit Partner Application'; btn.disabled = false;
       showPage('thanks-partner');
